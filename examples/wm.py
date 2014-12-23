@@ -9,13 +9,17 @@ border_color_active = 0xff333388
 
 
 class WManager(Manager):
+    """
+    Super simple wm example, assuming that there's only one screen
+    """
+
     def __init__(self):
         super(WManager, self).__init__()
         self.focused = None
 
     def arrange(self):
         screen = self.screens.values()[0]
-        screen_geometry = screen.usable_geometry
+        geometry = screen.usable_geometry
 
         windows = self.windows.values()
 
@@ -23,29 +27,26 @@ class WManager(Manager):
         if num_windows == 0:
             return
 
-        num_columns = int(math.ceil(math.sqrt(num_windows)))
-        num_rows = int(num_windows / num_columns + 1)
+        columns = int(math.ceil(math.sqrt(num_windows)))
+        rows = int(num_windows / columns + 1)
 
-        for nc in range(num_columns):
+        for nc in range(columns):
             if not windows:
                 break
 
-            geometry = {"x": 0, "y": 0, "width": 0, "height": 0}
-            geometry["x"] = screen_geometry.x + border_width + \
-                screen_geometry.width * nc / num_columns
-            geometry["width"] = screen_geometry.width / num_columns \
-                - 2 * border_width
+            x = y = width = height = 0
+            x = geometry.x + border_width + geometry.width * nc / columns
+            width = geometry.width / columns - 2 * border_width
 
-            if (nc == num_windows % num_columns):
-                num_rows -= 1
+            if (nc == num_windows % columns):
+                rows -= 1
 
-            for nr in range(num_rows):
+            for nr in range(rows):
                 window = windows.pop()
-                geometry["y"] = screen_geometry.y + border_width + \
-                    screen_geometry.height * nr / num_rows
-                geometry["height"] = screen_geometry.height / num_rows - 2 * \
-                    border_width
-                window.set_geometry(**geometry)
+                y = geometry.y + border_width + geometry.height * nr / rows
+                height = geometry.height / rows - 2 * border_width
+                window.set_geometry(x, y, width, height)
+
                 if not windows:
                     break
 

@@ -25,14 +25,13 @@ class Window(object):
         self.swc_window = swc_window
 
         # struct with the id of the window
-        window_data = ffi.new("struct window *")
-        window_data.window_id = self._id
-        self._window_data = window_data
+        self._window_data = ffi.new("struct window *")
+        self._window_data.window_id = self._id
 
         lib.swc_window_set_handler(
             swc_window,
             window_handler,
-            window_data
+            self._window_data
             )
 
     @property
